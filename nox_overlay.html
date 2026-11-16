@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+  :root { --speed: 4.8s; }
+  * { box-sizing: border-box; }
+  html, body { width:100%; height:100%; margin:0; overflow:hidden; background:transparent; }
+  #root { position:relative; width:100%; height:100%; overflow:hidden; background:transparent; }
+  #halo { position:absolute; inset:9% 3% 5%; border-radius:50%; border:1px solid #17e6ff55;
+    box-shadow:0 0 30px #1264ff44, inset 0 0 22px #17e6ff22; animation:breathe 6s ease-in-out infinite; }
+  #halo::before { content:""; position:absolute; inset:12%; border-radius:50%;
+    border:1px dashed #45dfff77; animation:rotate 28s linear infinite; }
+  #float { position:absolute; width:100%; top:9%; left:0; transform-origin:51% 58%;
+    animation:surf var(--speed) ease-in-out infinite; }
+  #float img { display:block; width:100%; height:auto; user-select:none; pointer-events:none;
+    filter:drop-shadow(0 8px 19px #0031a3bb) drop-shadow(0 0 9px #099cff88); }
+  #float.trick { animation:stardrive 1.85s cubic-bezier(.17,.67,.25,1) 1 !important; }
+  #float.trick img { filter:drop-shadow(0 0 15px #1affff) drop-shadow(0 0 25px #065fff); }
+  #root.sleeping #float { animation:surf 9s ease-in-out infinite; filter:brightness(.62) saturate(.8); }
+  #root.sleeping #halo { opacity:.3; }
+  #root.tricking #halo { border-color:#5defff; box-shadow:0 0 55px #17e6ff99; }
+  .spark { position:absolute; width:4px; height:4px; border-radius:50%; background:#73e9ff;
+    box-shadow:0 0 10px 2px #009dff; animation:particle 6s ease-in-out infinite; }
+  .a { top:14%;left:18%;animation-delay:-2s; } .b { top:22%;right:15%;animation-delay:-4s; }
+  .c { bottom:20%;left:16%;animation-delay:-1s; } .d { bottom:28%;right:11%;animation-delay:-3s; }
+  @keyframes surf { 0%,100% { transform:translateY(8px) rotate(-2.8deg) }
+    25% { transform:translateY(-5px) rotate(.9deg) } 50% { transform:translateY(-18px) rotate(2.6deg) }
+    75% { transform:translateY(-6px) rotate(-.6deg) } }
+  @keyframes stardrive { 0% { transform:translateY(0) rotate(0) scale(1) }
+    12% { transform:translateY(-18px) rotate(-14deg) scale(.92) }
+    32% { transform:translateY(-80px) rotate(35deg) scale(.83) }
+    60% { transform:translateY(-95px) rotate(310deg) scale(.85) }
+    80% { transform:translateY(-30px) rotate(371deg) scale(1.08) }
+    92% { transform:translateY(6px) rotate(358deg) scale(.98) }
+    100% { transform:translateY(0) rotate(360deg) scale(1) } }
+  @keyframes breathe { 50% { opacity:.55; transform:scale(1.08) } }
+  @keyframes rotate { to { transform:rotate(360deg) } }
+  @keyframes particle { 0%,100% { transform:translate(0,0) scale(.65);opacity:.2 }
+    50% { transform:translate(15px,-23px) scale(1.4);opacity:.9 } }
+  @media (prefers-reduced-motion: reduce) {
+    #float, #root.sleeping #float, #halo, #halo::before, .spark, #float.trick { animation:none !important; }
+  }
+</style>
+</head>
+<body>
+<div id="root">
+  <div id="halo"></div>
+  <div class="spark a"></div><div class="spark b"></div><div class="spark c"></div><div class="spark d"></div>
+  <div id="float"><img src="nox.png" alt="NOX mit schwarzer Cap auf einer leuchtenden Welle"></div>
+</div>
+<script>
+  (() => {
+    'use strict';
+    const root = document.getElementById('root');
+    const pet = document.getElementById('float');
+    let tricking = false;
+    window.noxSetState = (sleeping, turbo) => {
+      root.classList.toggle('sleeping', Boolean(sleeping));
+      document.documentElement.style.setProperty('--speed', turbo ? '2.2s' : '4.8s');
+    };
+    window.noxSpin = () => {
+      if (tricking || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      tricking = true;
+      root.classList.remove('sleeping');
+      pet.classList.remove('trick');
+      void pet.offsetWidth;
+      pet.classList.add('trick');
+      root.classList.add('tricking');
+    };
+    pet.addEventListener('animationend', event => {
+      if (event.animationName !== 'stardrive') return;
+      pet.classList.remove('trick');
+      root.classList.remove('tricking');
+      tricking = false;
+    });
+  })();
+</script>
+</body>
+</html>
